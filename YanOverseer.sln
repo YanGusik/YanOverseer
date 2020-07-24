@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YanOverseer", "YanOverseer\YanOverseer.csproj", "{31906D4E-DFE2-4FC1-BDE4-DCC295B4F0FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YanOverseer", "YanOverseer\YanOverseer.csproj", "{31906D4E-DFE2-4FC1-BDE4-DCC295B4F0FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YanOverseer.DAL", "YanOverseer.DAL\YanOverseer.DAL.csproj", "{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{31906D4E-DFE2-4FC1-BDE4-DCC295B4F0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31906D4E-DFE2-4FC1-BDE4-DCC295B4F0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31906D4E-DFE2-4FC1-BDE4-DCC295B4F0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
