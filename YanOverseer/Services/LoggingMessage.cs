@@ -100,7 +100,7 @@ namespace YanOverseer.Services
         {
             if (e.Channel.Id == _config.SecretChatId) return false;
             if (e.Message.Content == null) return false;
-            if (e.Message.Content.StartsWith(_config.CommandPrefix) ||
+            if (e.Message.Content.StartsWith(_config.CommandPrefix) || e.Message.Content.StartsWith(".") ||
                 _isEnabled == false || e.Message.Author.IsBot) return false;
             return true;
         }
@@ -109,8 +109,7 @@ namespace YanOverseer.Services
         {
             if (e.Channel.Id == _config.SecretChatId) return false;
             if (e.Message.Content == null) return false;
-            if (e.Message.Content.StartsWith(_config.CommandPrefix) ||
-                _isEnabled == false || e.Message.Author.IsBot) return false;
+            if (_isEnabled == false || e.Message.Author.IsBot) return false;
             return true;
         }
 
@@ -118,8 +117,7 @@ namespace YanOverseer.Services
         {
             if (e.Channel.Id == _config.SecretChatId) return false;
             if (e.Message.Content == null) return false;
-            if (e.Message.Content.StartsWith(_config.CommandPrefix) ||
-                _isEnabled == false || e.Message.Author.IsBot) return false;
+            if (_isEnabled == false || e.Message.Author.IsBot) return false;
             return true;
         }
 

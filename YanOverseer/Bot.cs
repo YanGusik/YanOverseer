@@ -45,6 +45,7 @@ namespace YanOverseer
             Client.MessageCreated += Client_MessageCreated;
             Client.MessageUpdated += Client_MessageUpdated;
             Client.MessageDeleted += Client_MessageDeleted;
+            Client.GuildMemberAdded += Client_GuildMemberAdded;
 
             var ccfg = new CommandsNextConfiguration
             {
@@ -73,6 +74,25 @@ namespace YanOverseer
         {
             e.Client.DebugLogger.LogMessage(LogLevel.Info, "YanOverseer", "Client is ready to process events.", DateTime.Now);
             return Task.CompletedTask;
+        }
+
+        private async Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
+        {
+            var channel = await e.Member.CreateDmChannelAsync();
+            var embed = new DiscordEmbedBuilder
+            {
+                Description = $"Hey <@{e.Member.Id}>, welcome to **{e.Guild.Name}** Discord Server!\r\n\r\n" +
+                              $"**You are the {e.Guild.MemberCount}th member :tada: **\r\n\r\n" +
+                              $"Введи себя там хорошо и будь паянькой :3 \r\n" +
+                              $"Вот тебе за прочитанное котика",
+                ImageUrl = "https://sun9-39.userapi.com/c639830/v639830979/45459/AvphDx2dNLQ.jpg",
+                Color = DiscordColor.Goldenrod
+            };
+
+            await channel.SendMessageAsync(embed: embed);
+
+
+            await e.Member.GrantRoleAsync(e.Guild.GetRole(718102202081869945));
         }
 
         private Task Client_MessageCreated(MessageCreateEventArgs e)
