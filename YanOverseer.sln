@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YanOverseer", "YanOverseer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YanOverseer.DAL", "YanOverseer.DAL\YanOverseer.DAL.csproj", "{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YanOverseer.BLL", "YanOverseer.BLL\YanOverseer.BLL.csproj", "{A90D567B-4963-4BC9-A398-1ABE15B36935}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79E7C0C1-BA1B-4270-91E5-8A446EEAE8BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A90D567B-4963-4BC9-A398-1ABE15B36935}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A90D567B-4963-4BC9-A398-1ABE15B36935}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A90D567B-4963-4BC9-A398-1ABE15B36935}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A90D567B-4963-4BC9-A398-1ABE15B36935}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

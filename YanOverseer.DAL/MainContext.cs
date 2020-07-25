@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using YanOverseer.DAL.Models;
 
 namespace YanOverseer.DAL
@@ -10,8 +7,8 @@ namespace YanOverseer.DAL
     {
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<ServerSettings> ServerSettings { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-            optionsBuilder.UseSqlite("Data Source=main.db");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite("Data Source=blogging.db");
     }
 }

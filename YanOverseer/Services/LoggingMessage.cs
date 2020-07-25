@@ -1,18 +1,21 @@
 ﻿using System;
-using Autofac;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using YanOverseer.BLL.Interfaces;
+using YanOverseer.Services.Interfaces;
 
 namespace YanOverseer.Services
 {
     public class LoggingMessage : ILoggingMessage
     {
+        private readonly Config _config;
+        private readonly IMessageService _messageService;
         private bool _isEnabled = true;
-        private Config _config;
 
-        public LoggingMessage(Config config)
+        public LoggingMessage(Config config, IMessageService messageService)
         {
             _config = config;
+            _messageService = messageService;
         }
 
         public void Enable()
@@ -29,41 +32,44 @@ namespace YanOverseer.Services
         {
             if (!IsValid(e)) return;
 
-            if (channel == null)
-            {
-                throw new ArgumentException("SecretChannel not found in Discord");
-            }
+            if (channel == null) throw new ArgumentException("SecretChannel not found in Discord");
 
             await channel.SendMessageAsync($"{e.Message.Author.Username} - {e.Message.Content}");
         }
 
-        // TODO: Not working, because prev message not saving
+        // TODO: It is necessary to reconsider the responsibility of this class.
+        // At the moment it logs messages, finds previous messages and uses the Logical Layer (Core), refactoring is necessary
         public async void Log(MessageUpdateEventArgs e, DiscordChannel channel)
         {
             if (!IsValid(e)) return;
 
-            if (channel == null)
-            {
-                throw new ArgumentException("SecretChannel not found in Discord");
-            }
+            if (channel == null) throw new ArgumentException("SecretChannel not found in Discord");
+
+            var prevMessage = await _messageService.GetMessageByIdAsync(e.Message.Id);
+
+            if (prevMessage == null)
+                return;
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor()
+                Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = e.Message.Author.Username,
-                    IconUrl = e.Message.Author.AvatarUrl,
+                    IconUrl = e.Message.Author.AvatarUrl
                 },
-                Description = $"**Message edited in <#{e.Channel.Id}>** [Jump to message](https://discordapp.com/channels/{e.Guild.Id}/{e.Channel.Id}/{e.Message.Id})\r\n" +
-                              $"**Before**\r\n" +
-                              $"{e.Message.Content} |not work functional|\r\n" +
-                              $"**After**\r\n{e.Message.Content}",
-                Footer = new DiscordEmbedBuilder.EmbedFooter()
+                Description =
+                    $"**Message edited in <#{e.Channel.Id}>** [Jump to message](https://discordapp.com/channels/{e.Guild.Id}/{e.Channel.Id}/{e.Message.Id})\r\n" +
+                    "**Before**\r\n" +
+                    $"{prevMessage.Content}\r\n" +
+                    $"**After**\r\n{e.Message.Content}",
+                Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
                     Text = $"User ID: {e.Message.Author.Id}"
                 },
                 Color = new DiscordColor("#117ea6")
             };
+
+            await _messageService.UpdateMessageAsync(prevMessage.Id, e.Message.Content);
 
             await channel.SendMessageAsync(embed: embed);
         }
@@ -72,21 +78,18 @@ namespace YanOverseer.Services
         {
             if (!IsValid(e)) return;
 
-            if (channel == null)
-            {
-                throw new ArgumentException("SecretChannel not found in Discord");
-            }
+            if (channel == null) throw new ArgumentException("SecretChannel not found in Discord");
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor()
+                Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = e.Message.Author.Username,
-                    IconUrl = e.Message.Author.AvatarUrl,
+                    IconUrl = e.Message.Author.AvatarUrl
                 },
                 Description = $"**Message sent by <@{e.Message.Author.Id}> deleted in <#{e.Channel.Id}>**\r\n"
                               + $"{e.Message.Content}",
-                Footer = new DiscordEmbedBuilder.EmbedFooter()
+                Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
                     Text = $"Author: {e.Message.Author.Id} | Message ID: {e.Message.Id}"
                 },
@@ -120,6 +123,5 @@ namespace YanOverseer.Services
             if (_isEnabled == false || e.Message.Author.IsBot) return false;
             return true;
         }
-
     }
 }

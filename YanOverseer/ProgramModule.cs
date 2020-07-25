@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using Autofac;
+using Microsoft.EntityFrameworkCore;
+using YanOverseer.BLL.Interfaces;
+using YanOverseer.BLL.Services;
+using YanOverseer.DAL;
 using YanOverseer.Services;
+using YanOverseer.Services.Interfaces;
 
 namespace YanOverseer
 {
@@ -10,6 +15,13 @@ namespace YanOverseer
     {
         protected override void Load(ContainerBuilder builder)
         {
+            // DB
+            builder.RegisterType<MainContext>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ProfileService>().As<IProfileService>();
+            builder.RegisterType<MessageService>().As<IMessageService>();
+            builder.RegisterType<StatisticsService>().As<IStatisticsService>();
+
             builder.RegisterType<ConfigLoader>().As<IConfigLoader>();
 
             // TODO: Add some useful code here
@@ -20,6 +32,8 @@ namespace YanOverseer
 
             builder.RegisterType<Bot>().AsSelf().SingleInstance();
             builder.RegisterType<LoggingMessage>().As<ILoggingMessage>();
+            builder.RegisterType<StatisticsProfile>().As<IStatisticsProfile>();
+            builder.RegisterType<ServerSettingsService>().As<IServerSettingsService>();
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
+using YanOverseer.Services.Interfaces;
 
 namespace YanOverseer.Services
 {
@@ -13,10 +12,7 @@ namespace YanOverseer.Services
 
         public ConfigLoader()
         {
-            if (!File.Exists(FileName))
-            {
-                File.Create(FileName).Close();
-            }
+            if (!File.Exists(FileName)) File.Create(FileName).Close();
         }
 
         public void Save(Config config)
@@ -29,7 +25,7 @@ namespace YanOverseer.Services
             try
             {
                 var json = File.ReadAllText(FileName);
-                Config config = JsonConvert.DeserializeObject<Config>(json);
+                var config = JsonConvert.DeserializeObject<Config>(json);
                 if (config == null)
                     throw new Exception("File configution is empty");
                 return config;
@@ -39,7 +35,6 @@ namespace YanOverseer.Services
                 Debug.WriteLine($"File configutaion not found with name {e.FileName}");
                 throw;
             }
-            
         }
     }
 }

@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using YanOverseer.Attributes;
 
 namespace YanOverseer.Commands
 {
-    [RequireRolesAttribute("Артас", "Footman")]
+    [RequireUserType(UserTypeCheckMode.MineOrParentAny, UserType.Moderator)]
     [Description("Moderator commands.")]
     public class ModeratorCommands
     {

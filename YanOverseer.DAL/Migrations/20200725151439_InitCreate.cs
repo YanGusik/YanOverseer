@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace YanOverseer.DAL.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,9 +13,12 @@ namespace YanOverseer.DAL.Migrations
                 {
                     Id = table.Column<ulong>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    DiscordId = table.Column<ulong>(nullable: false),
+                    GuildId = table.Column<ulong>(nullable: false),
                     CountTextMessage = table.Column<int>(nullable: false),
                     CountMessageWithImage = table.Column<int>(nullable: false),
-                    CountMessageWithUrl = table.Column<int>(nullable: false)
+                    CountMessageWithUrl = table.Column<int>(nullable: false),
+                    Alias = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -23,11 +26,25 @@ namespace YanOverseer.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ServerSettings",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(nullable: false),
+                    ModeratorRoleName = table.Column<string>(nullable: true),
+                    AutoRoleName = table.Column<string>(nullable: true),
+                    AutoRole = table.Column<bool>(nullable: false),
+                    AutoWelcomeMessage = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServerSettings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Id = table.Column<ulong>(nullable: false),
                     Content = table.Column<string>(nullable: true),
                     Timestamp = table.Column<DateTimeOffset>(nullable: false),
                     ProfileId = table.Column<ulong>(nullable: false)
@@ -53,6 +70,9 @@ namespace YanOverseer.DAL.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "ServerSettings");
 
             migrationBuilder.DropTable(
                 name: "Profiles");

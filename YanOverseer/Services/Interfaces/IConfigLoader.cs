@@ -1,4 +1,4 @@
-﻿namespace YanOverseer.Services
+﻿namespace YanOverseer.Services.Interfaces
 {
     public interface IConfigLoader
     {

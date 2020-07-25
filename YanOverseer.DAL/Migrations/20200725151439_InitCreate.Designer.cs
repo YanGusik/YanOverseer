@@ -9,8 +9,8 @@ using YanOverseer.DAL;
 namespace YanOverseer.DAL.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20200724115524_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20200725151439_InitCreate")]
+    partial class InitCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,6 @@ namespace YanOverseer.DAL.Migrations
             modelBuilder.Entity("YanOverseer.DAL.Models.Message", b =>
                 {
                     b.Property<ulong>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
@@ -46,6 +45,9 @@ namespace YanOverseer.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Alias")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CountMessageWithImage")
                         .HasColumnType("INTEGER");
 
@@ -55,9 +57,37 @@ namespace YanOverseer.DAL.Migrations
                     b.Property<int>("CountTextMessage")
                         .HasColumnType("INTEGER");
 
+                    b.Property<ulong>("DiscordId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("YanOverseer.DAL.Models.ServerSettings", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoRole")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AutoRoleName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("AutoWelcomeMessage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModeratorRoleName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServerSettings");
                 });
 
             modelBuilder.Entity("YanOverseer.DAL.Models.Message", b =>

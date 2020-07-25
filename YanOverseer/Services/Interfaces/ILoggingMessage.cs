@@ -1,7 +1,7 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 
-namespace YanOverseer.Services
+namespace YanOverseer.Services.Interfaces
 {
     public interface ILoggingMessage
     {
