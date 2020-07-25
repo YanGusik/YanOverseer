@@ -8,7 +8,6 @@
         public int CountTextMessage { get; set; }
         public int CountMessageWithImage { get; set; }
         public int CountMessageWithUrl { get; set; }
-
         public string Alias { get; set; }
     }
 }
