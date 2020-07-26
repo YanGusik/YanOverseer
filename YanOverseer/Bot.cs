@@ -9,6 +9,7 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using YanOverseer.BLL.Interfaces;
 using YanOverseer.Commands;
+using YanOverseer.DAL.Models;
 using YanOverseer.Services;
 using YanOverseer.Services.Interfaces;
 
@@ -20,17 +21,16 @@ namespace YanOverseer
         private readonly ILoggingMessage _loggingMessage;
         private readonly IProfileService _profileService;
         private readonly IMessageService _messageService;
-        private readonly IServerSettingsService _serverSettingsService;
+        private readonly IGuildSettingsService _guildSettingsService;
         private readonly IStatisticsProfile _stasticsProfile;
-        private DiscordChannel _secretChannel;
 
-        public Bot(Config config, ILoggingMessage loggingMessage, IProfileService profileService, IMessageService messageService, IServerSettingsService serverSettingsService, IStatisticsProfile stasticsProfile)
+        public Bot(Config config, ILoggingMessage loggingMessage, IProfileService profileService, IMessageService messageService, IGuildSettingsService guildSettingsService, IStatisticsProfile stasticsProfile)
         {
             _config = config;
             _loggingMessage = loggingMessage;
             _profileService = profileService;
             _messageService = messageService;
-            _serverSettingsService = serverSettingsService;
+            _guildSettingsService = guildSettingsService;
             _stasticsProfile = stasticsProfile;
         }
 
@@ -64,8 +64,8 @@ namespace YanOverseer
                 StringPrefix = _config.CommandPrefix,
                 EnableDms = true,
                 EnableMentionPrefix = true,
-                
-                
+
+
             };
 
             Commands = Client.UseCommandsNext(ccfg);
@@ -83,11 +83,10 @@ namespace YanOverseer
 
             await Client.ConnectAsync();
 
-
-            _secretChannel = await Client.GetChannelAsync(_config.SecretChatId);
-
             await Task.Delay(-1);
         }
+
+        #region Events
 
         private Task Client_Ready(ReadyEventArgs e)
         {
@@ -97,55 +96,84 @@ namespace YanOverseer
 
         private async Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
-            // TODO: Subscribe to an event in the main class and write logic in it, ahem, I need to think later
+            var guildSettings = await _guildSettingsService.GetGuildSettingsByIdAsync(e.Guild.Id);
 
-            var serverSettings = await _serverSettingsService.GetServerSettingsByIdAsync(e.Guild.Id);
-            if (serverSettings == null) return;
+            if (guildSettings == null) return;
 
-            if (serverSettings.AutoRole)
+            if (guildSettings.AutoWelcomeMessage)
             {
-                var channel = await e.Member.CreateDmChannelAsync();
-                var embed = new DiscordEmbedBuilder
-                {
-                    Description = $"Hey <@{e.Member.Id}>, welcome to **{e.Guild.Name}** Discord Server!\r\n\r\n" +
-                                  $"**You are the {e.Guild.MemberCount}th member :tada: **\r\n\r\n" +
-                                  $"Введи себя там хорошо и будь паянькой :3 \r\n" +
-                                  $"Вот тебе за прочитанное котика",
-                    ImageUrl = "https://sun9-39.userapi.com/c639830/v639830979/45459/AvphDx2dNLQ.jpg",
-                    Color = DiscordColor.Goldenrod
-                };
-
-                await channel.SendMessageAsync(embed: embed);
+                await SendWelcomeMessage(e.Member, GetWelcomeMessagEmbed(e.Member, e.Guild));
             }
 
-            var role = e.Guild.Roles.FirstOrDefault(discordRole => discordRole.Name == serverSettings.AutoRoleName);
-
-            if (serverSettings.AutoWelcomeMessage && role != null)
+            if (guildSettings.AutoRole)
             {
-                await e.Member.GrantRoleAsync(e.Guild.GetRole(718102202081869945));
+                await GrantDefaultRole(e.Member, guildSettings.AutoRoleName);
             }
         }
 
         private async Task Client_MessageCreated(MessageCreateEventArgs e)
         {
+            var guildSettings = await _guildSettingsService.GetGuildSettingsByIdAsync(e.Guild.Id);
+
+            if (guildSettings == null) return;
+
             var profile = await _profileService.GetOrCreateProfileAsync(e.Author.Id, e.Guild.Id);
+
+            // Add message to BD
             await _messageService.CreateNewMessageAsync(e.Message.Id, e.Message.Content, e.Message.Timestamp, profile.Id);
+            // Change statistics for Profile
             await _stasticsProfile.ChangeProfileStatisticsAsync(profile.Id, e.Message);
 
-            _loggingMessage.Log(e, _secretChannel);
+            // Log
+            if (guildSettings.AutoLogCreateMessage)
+            {
+                var channel = await Client.GetChannelAsync(guildSettings.CreateMessageChannel);
+                if (e.Message.Author.IsBot) return;
+                if (e.Channel == channel) return;
+                if (e.Message.Content.StartsWith(_config.CommandPrefix)) return;
+                await _loggingMessage.CreateAsync(channel, e.Message);
+            }
         }
 
         private async Task Client_MessageDeleted(MessageDeleteEventArgs e)
         {
+            var guildSettings = await _guildSettingsService.GetGuildSettingsByIdAsync(e.Guild.Id);
+
+            if (guildSettings == null) return;
+
+            // Delete message from BD
             await _messageService.DeleteMessageAsync(e.Message.Id);
-            _loggingMessage.Log(e, _secretChannel);
+
+            // Log
+            if (guildSettings.AutoLogUpdateMessage)
+            {
+                var channel = await Client.GetChannelAsync(guildSettings.CreateMessageChannel);
+                if (e.Message.Author.IsBot) return;
+                if (e.Channel == channel) return;
+                if (e.Message.Content.StartsWith(_config.CommandPrefix)) return;
+                await _loggingMessage.DeleteAsync(channel, e.Message);
+            }
         }
 
-        private Task Client_MessageUpdated(MessageUpdateEventArgs e)
+        private async Task Client_MessageUpdated(MessageUpdateEventArgs e)
         {
-            _loggingMessage.Log(e, _secretChannel);
+            var guildSettings = await _guildSettingsService.GetGuildSettingsByIdAsync(e.Guild.Id);
 
-            return Task.CompletedTask;
+            if (guildSettings == null) return;
+
+            // Update message from BD
+            await _messageService.UpdateMessageAsync(e.Message.Id, e.Message.Content);
+
+            // Log
+            if (guildSettings.AutoLogUpdateMessage)
+            {
+                var channel = await Client.GetChannelAsync(guildSettings.CreateMessageChannel);
+                if (e.Message.Author.IsBot) return;
+                if (e.Channel == channel) return;
+                if (e.Message.Content.StartsWith(_config.CommandPrefix)) return;
+                var prevMessage = await _messageService.GetMessageByIdAsync(e.Message.Id);
+                await _loggingMessage.UpdateAsync(channel, e.Message, prevMessage.Content);
+            }
         }
 
         private Task Client_GuildAvailable(GuildCreateEventArgs e)
@@ -188,5 +216,36 @@ namespace YanOverseer
                 await e.Context.RespondAsync("", embed: embed);
             }
         }
+
+        #endregion
+
+        #region Method
+
+        public DiscordEmbed GetWelcomeMessagEmbed(DiscordMember member, DiscordGuild guild)
+        {
+            return new DiscordEmbedBuilder
+            {
+                Description = $"Hey <@{member.Id}>, welcome to **{guild.Name}** Discord Server!\r\n\r\n" +
+                              $"**You are the {guild.MemberCount}th member :tada: **\r\n\r\n" +
+                              $"Введи себя там хорошо и будь паянькой :3 \r\n" +
+                              $"Вот тебе за прочитанное котика",
+                ImageUrl = "https://sun9-39.userapi.com/c639830/v639830979/45459/AvphDx2dNLQ.jpg",
+                Color = DiscordColor.Goldenrod
+            };
+        }
+
+        private async Task GrantDefaultRole(DiscordMember member, string roleName)
+        {
+            var role = member.Guild.Roles.FirstOrDefault(discordRole => discordRole.Name == roleName);
+            if (role != null) await member.GrantRoleAsync(member.Guild.GetRole(role.Id));
+        }
+
+        private async Task SendWelcomeMessage(DiscordMember member, DiscordEmbed embed)
+        {
+            var channel = await member.CreateDmChannelAsync();
+            await channel.SendMessageAsync(embed: embed);
+        }
+
+        #endregion
     }
 }

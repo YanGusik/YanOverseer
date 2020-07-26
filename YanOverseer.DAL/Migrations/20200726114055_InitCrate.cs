@@ -3,10 +3,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace YanOverseer.DAL.Migrations
 {
-    public partial class InitCreate : Migration
+    public partial class InitCrate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "GuildSettings",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(nullable: false),
+                    ModeratorRoleName = table.Column<string>(nullable: true),
+                    AutoRoleName = table.Column<string>(nullable: true),
+                    CreateMessageChannel = table.Column<ulong>(nullable: false),
+                    UpdateMessageChannel = table.Column<ulong>(nullable: false),
+                    DeleteMessageChannel = table.Column<ulong>(nullable: false),
+                    AutoRole = table.Column<bool>(nullable: false),
+                    AutoWelcomeMessage = table.Column<bool>(nullable: false),
+                    AutoLogCreateMessage = table.Column<bool>(nullable: false),
+                    AutoLogUpdateMessage = table.Column<bool>(nullable: false),
+                    AutoLogDeleteMessage = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuildSettings", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Profiles",
                 columns: table => new
@@ -23,21 +44,6 @@ namespace YanOverseer.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Profiles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ServerSettings",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(nullable: false),
-                    ModeratorRoleName = table.Column<string>(nullable: true),
-                    AutoRoleName = table.Column<string>(nullable: true),
-                    AutoRole = table.Column<bool>(nullable: false),
-                    AutoWelcomeMessage = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServerSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,10 +75,10 @@ namespace YanOverseer.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Messages");
+                name: "GuildSettings");
 
             migrationBuilder.DropTable(
-                name: "ServerSettings");
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Profiles");

@@ -7,7 +7,7 @@ namespace YanOverseer.DAL
     {
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<ServerSettings> ServerSettings { get; set; }
+        public DbSet<GuildSettings> GuildSettings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite("Data Source=blogging.db");
     }

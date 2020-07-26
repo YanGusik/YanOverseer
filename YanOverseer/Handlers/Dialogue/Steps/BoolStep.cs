@@ -54,8 +54,7 @@ namespace YanOverseer.Handlers.Dialogue.Steps
                 }
 
 
-                if (messageResult.Message.Content.Contains("true") || messageResult.Message.Content.Contains("false") ||
-                    messageResult.Message.Content.Contains("1") || messageResult.Message.Content.Contains("0"))
+                if (messageResult.Message.Content.Contains("true") || messageResult.Message.Content.Contains("false"))
                 {
                     if (bool.TryParse(messageResult.Message.Content, out bool result))
                     {
@@ -65,7 +64,7 @@ namespace YanOverseer.Handlers.Dialogue.Steps
                     return false;
                 }
 
-                await TryAgain(channel, $"Your input is not a [true,false,1,0]").ConfigureAwait(false);
+                await TryAgain(channel, $"Your input is not a [true, false]").ConfigureAwait(false);
             }
         }
     }

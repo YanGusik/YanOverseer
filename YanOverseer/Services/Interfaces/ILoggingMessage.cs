@@ -1,14 +1,13 @@
-﻿using DSharpPlus.Entities;
+﻿using System.Threading.Tasks;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 
 namespace YanOverseer.Services.Interfaces
 {
     public interface ILoggingMessage
     {
-        void Enable();
-        void Disable();
-        void Log(MessageCreateEventArgs e, DiscordChannel channel);
-        void Log(MessageUpdateEventArgs e, DiscordChannel channel);
-        void Log(MessageDeleteEventArgs e, DiscordChannel channel);
+        Task CreateAsync(DiscordChannel channel, DiscordMessage message);
+        Task UpdateAsync(DiscordChannel channel, DiscordMessage message, string prevMessage);
+        Task DeleteAsync(DiscordChannel channel, DiscordMessage message);
     }
 }

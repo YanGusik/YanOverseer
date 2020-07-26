@@ -33,7 +33,7 @@ namespace YanOverseer
             builder.RegisterType<Bot>().AsSelf().SingleInstance();
             builder.RegisterType<LoggingMessage>().As<ILoggingMessage>();
             builder.RegisterType<StatisticsProfile>().As<IStatisticsProfile>();
-            builder.RegisterType<ServerSettingsService>().As<IServerSettingsService>();
+            builder.RegisterType<GuildSettingsService>().As<IGuildSettingsService>();
         }
     }
 }

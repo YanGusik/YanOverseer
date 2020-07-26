@@ -10,7 +10,5 @@ namespace YanOverseer.Services
         [JsonProperty("token")] public string Token { get; private set; }
 
         [JsonProperty("prefix")] public string CommandPrefix { get; private set; }
-
-        [JsonProperty("secretchat_id")] public ulong SecretChatId { get; private set; }
     }
 }

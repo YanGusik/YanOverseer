@@ -16,6 +16,46 @@ namespace YanOverseer.DAL.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.6");
 
+            modelBuilder.Entity("YanOverseer.DAL.Models.GuildSettings", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoLogCreateMessage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoLogDeleteMessage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoLogUpdateMessage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoRole")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AutoRoleName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("AutoWelcomeMessage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("CreateMessageChannel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("DeleteMessageChannel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModeratorRoleName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("UpdateMessageChannel")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GuildSettings");
+                });
+
             modelBuilder.Entity("YanOverseer.DAL.Models.Message", b =>
                 {
                     b.Property<ulong>("Id")
@@ -64,28 +104,6 @@ namespace YanOverseer.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Profiles");
-                });
-
-            modelBuilder.Entity("YanOverseer.DAL.Models.ServerSettings", b =>
-                {
-                    b.Property<ulong>("Id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("AutoRole")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AutoRoleName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("AutoWelcomeMessage")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ModeratorRoleName")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServerSettings");
                 });
 
             modelBuilder.Entity("YanOverseer.DAL.Models.Message", b =>

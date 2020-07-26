@@ -16,14 +16,14 @@ namespace YanOverseer.Attributes
     {
         private readonly UserType[] _userTypes;
         private readonly UserTypeCheckMode _checkMode;
-        private readonly IServerSettingsService _serverSettingsService;
-        private ServerSettings _serverSettings;
+        private readonly IGuildSettingsService _serverSettingsService;
+        private GuildSettings _serverSettings;
 
         public RequireUserTypeAttribute(UserTypeCheckMode checkMode, params UserType[] userTypes)
         {
             _userTypes = userTypes;
             _checkMode = checkMode;
-            _serverSettingsService = Program.Container.Resolve<IServerSettingsService>();
+            _serverSettingsService = Program.Container.Resolve<IGuildSettingsService>();
         }
 
         public override async Task<bool> CanExecute(CommandContext ctx, bool help)
@@ -33,7 +33,7 @@ namespace YanOverseer.Attributes
                 return false;
             }
 
-            _serverSettings = await _serverSettingsService.GetServerSettingsByIdAsync(ctx.Guild.Id);
+            _serverSettings = await _serverSettingsService.GetGuildSettingsByIdAsync(ctx.Guild.Id);
 
             var userRealType = GetUserType(ctx.Member);
 

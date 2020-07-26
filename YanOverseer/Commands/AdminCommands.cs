@@ -21,37 +21,59 @@ namespace YanOverseer.Commands
         [Description("Configurate your server")]
         public async Task Configurate(CommandContext ctx)
         {
+            
             var moderatorRoleStep = new TextStep("What is the name of the role of the moderator?", null);
             var autoRoleNameStep = new TextStep("What is the default role called when a new member joins?", moderatorRoleStep);
-            var autoRoleStep = new BoolStep("Should auto-assignment features be enabled?", autoRoleNameStep);
-            var autoWelcomeMessageStep = new BoolStep("Should the welcome features be enabled?", autoRoleStep);
+            var createMessageChannelStep = new UlongStep("Id Create Message Channel", autoRoleNameStep);
+            var updateMessageChannelStep = new UlongStep("Id Update Message Channel", createMessageChannelStep);
+            var deleteMessageChannelStep = new UlongStep("Id Delete Message Channel", updateMessageChannelStep);
+
+            var autoRoleStep = new BoolStep("Включить ли автороль?", deleteMessageChannelStep);
+            var autoWelcomeMessageStep = new BoolStep("Включить ли автоприветствие?", autoRoleStep);
+            var autoLogCreateMessageStep = new BoolStep("Log when creating posts?", autoWelcomeMessageStep);
+            var autoLogUpdateMessageStep = new BoolStep("Log when editing posts?", autoLogCreateMessageStep);
+            var autoLogDeleteMessageStep = new BoolStep("Log when deleting posts?", autoLogUpdateMessageStep);
+
+            bool autoRole = false;
+            bool autoWelcomeMessage = false;
+            var autoLogCreateMessage = false;
+            var autoLogUpdateMessage = false;
+            var autoLogDeleteMessage = false;
 
             string moderatorRole = "";
             string autoRoleName = "";
-            bool autoRole = false;
-            bool autoWelcomeMessage = false;
+            ulong createMessageChannel = 0;
+            ulong updateMessageChannel = 0;
+            ulong deleteMessageChannel = 0;
+
+            autoRoleStep.OnValidResult += (result) => autoRole = result;
+            autoWelcomeMessageStep.OnValidResult += (result) => autoWelcomeMessage = result;
+            autoLogCreateMessageStep.OnValidResult += (result) => autoLogCreateMessage = result;
+            autoLogUpdateMessageStep.OnValidResult += (result) => autoLogUpdateMessage = result;
+            autoLogDeleteMessageStep.OnValidResult += (result) => autoLogDeleteMessage = result;
 
             moderatorRoleStep.OnValidResult += (result) => moderatorRole = result;
             autoRoleNameStep.OnValidResult += (result) => autoRoleName = result;
-            autoRoleStep.OnValidResult += (result) => autoRole = result;
-            autoWelcomeMessageStep.OnValidResult += (result) => autoWelcomeMessage = result;
+            createMessageChannelStep.OnValidResult += (result) => createMessageChannel = result;
+            updateMessageChannelStep.OnValidResult += (result) => updateMessageChannel = result;
+            deleteMessageChannelStep.OnValidResult += (result) => deleteMessageChannel = result;
 
             var inputDialogueHandler = new DialogueHandler(
-                ctx.Client,
-                ctx.Channel,
-                ctx.User,
-                autoWelcomeMessageStep
-            );
+                    ctx.Client,
+                    ctx.Channel,
+                    ctx.User,
+                    autoLogDeleteMessageStep
+                );
 
             bool succeeded = await inputDialogueHandler.ProcessDialogue().ConfigureAwait(false);
 
             if (!succeeded) { return; }
 
-            var serverSettingsService = Program.Container.Resolve<IServerSettingsService>();
-            if (await serverSettingsService.GetServerSettingsByIdAsync(ctx.Guild.Id) == null)
-                await serverSettingsService.CreateServerSettingsAsync(ctx.Guild.Id, moderatorRole, autoRoleName, autoRole, autoWelcomeMessage);
+            var guildSettingsService = Program.Container.Resolve<IGuildSettingsService>();
+            if (await guildSettingsService.GetGuildSettingsByIdAsync(ctx.Guild.Id) == null)
+                await guildSettingsService.CreateGuildSettingsAsync(ctx.Guild.Id, autoRoleName, moderatorRole, createMessageChannel, updateMessageChannel, deleteMessageChannel, autoRole, autoWelcomeMessage, autoLogCreateMessage, autoLogUpdateMessage, autoLogDeleteMessage);
             else
-                await serverSettingsService.UpdateServerSettingsAsync(ctx.Guild.Id, moderatorRole, autoRoleName, autoRole, autoWelcomeMessage);
+                await guildSettingsService.UpdateGuildSettingsAsync(ctx.Guild.Id, autoRoleName, moderatorRole, createMessageChannel, updateMessageChannel, deleteMessageChannel, autoRole, autoWelcomeMessage, autoLogCreateMessage, autoLogUpdateMessage, autoLogDeleteMessage);
         }
 
         [Command("sudo")]
